@@ -19,7 +19,7 @@ taxonomy_file_path = sys.argv[1]
 import os
 all_ids = []
 init_dl_string = 'esearch -db nuccore -query "('
-init_other_dl_string = 'esearch -db gene -query "('
+init_other_dl_string = 'esearch -db gene -query \'('
 
 with open(taxonomy_file_path) as fh:
     for line in fh:
@@ -35,7 +35,7 @@ with open(taxonomy_file_path) as fh:
         dl_string = dl_string.rstrip('OR ') + ')' + ' AND (Small subunit [Title] OR 16S[Title] OR 16S ribosomal RNA[Title] OR 16S rRNA[Title]) AND (mitochondrion[Filter] OR plastid[Filter]) NOT environmental sample[Title] NOT environmental samples[Title] NOT environmental[Title] NOT uncultured[Title] NOT unclassified[Title] NOT unidentified[Title] NOT unverified[Title] " | efetch -format fasta >> 16S_fish_nuccore.fasta'
         other_dl_string = init_other_dl_string
         other_dl_string += f'txid{thisid}[ORGN] OR '
-        other_dl_string = other_dl_string.rstrip('OR ') + ') AND (Small subunit [Title] OR 16S[Title])  AND ("source mitochondrion"[property] AND alive[prop])" | efetch -format docsum |   xtract -pattern GenomicInfoType -element ChrAccVer ChrStart ChrStop | while IFS=$\'\\t\' read acn str stp;   do  efetch -db nuccore -format fasta  -id "$acn" -chr_start "$str" -chr_stop "$stp"; done | sed "s/>/>16S_/" >> 16S_fish_gene.fasta'
+        other_dl_string = other_dl_string.rstrip('OR ') + ') AND (Small subunit [Title] OR 16S[Title])  AND ("source mitochondrion"[property] AND alive[prop])\' | efetch -format docsum |   xtract -pattern GenomicInfoType -element ChrAccVer ChrStart ChrStop | while IFS=$\'\\t\' read acn str stp;   do  efetch -db nuccore -format fasta  -id "$acn" -chr_start "$str" -chr_stop "$stp"; done | sed "s/>/>16S_/" >> 16S_fish_gene.fasta'
         #print(dl_string)
         print(dl_string)
         print(other_dl_string)

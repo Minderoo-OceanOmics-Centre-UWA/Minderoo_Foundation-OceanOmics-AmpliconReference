@@ -1,6 +1,7 @@
 # mamba create -n entrez -c bioconda entrez-direct -y
 # conda activate entrez
 
+import sys
 
 # error taxa
 
@@ -11,12 +12,17 @@
 #crashes for two IDs:
         #<PhraseNotFound>txid760215[ORGN]</PhraseNotFound>
         #<PhraseNotFound>txid30891[ORGN]</PhraseNotFound>
+if len(sys.argv) != 2:
+    print("Usage: python getAssemblies.py <taxonomy_file_path>", file=sys.stderr)
+    sys.exit(1)
+taxonomy_file_path = sys.argv[1]
+
 not_in_gene = set(['760215', '30891'])
 import os
 all_ids = []
 dl_string = 'esearch -db nuccore -query \'('
 #other_dl_string = 'esearch -db gene -query "('
-with open('../../taxonomies/Fishbase_with_our_marine_families_and_Sauria_Aves_Mammalia.taxids.txt') as fh:
+with open(taxonomy_file_path) as fh:
     for line in fh:
         ll = line.split()
         if len(ll) != 2:
@@ -33,7 +39,7 @@ dl_string = dl_string.rstrip('OR ') + ')' + ' AND \"complete genome\"[Title] AND
 #other_dl_string = other_dl_string.rstrip('OR ') + ') AND 12S[Title] " | efetch -format docsum |   xtract -pattern GenomicInfoType -element ChrAccVer ChrStart ChrStop | while IFS=$\'\\t\' read acn str stp;   do ;  efetch -db nuccore -format fasta  -id "$acn" -chr_start "$str" -chr_stop "$stp"; done | sed "s/>/>12S_/" > 12s_fish_gene.fasta'
 #print(os.popen(dl_string).read())
 print(dl_string)
-print(os.popen(dl_string).read())
+#print(os.popen(dl_string).read())
 #print(os.popen(dl_string).read())
 #print(other_dl_string)
 #print(os.popen(dl_string).read())
